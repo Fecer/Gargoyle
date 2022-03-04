@@ -13,6 +13,8 @@ import uk.ac.gla.dcs.bigdata.providedfunctions.QueryFormaterMap;
 import uk.ac.gla.dcs.bigdata.providedstructures.DocumentRanking;
 import uk.ac.gla.dcs.bigdata.providedstructures.NewsArticle;
 import uk.ac.gla.dcs.bigdata.providedstructures.Query;
+import uk.ac.gla.dcs.bigdata.studentfunctions.NewsTokensFormaterMap;
+import uk.ac.gla.dcs.bigdata.studentstructures.NewsTokens;
 
 /**
  * This is the main class where your Spark topology should be specified.
@@ -31,7 +33,7 @@ public class AssessedExercise {
 		File hadoopDIR = new File("resources/hadoop/"); // represent the hadoop directory as a Java file so we can get an absolute path for it
 		System.setProperty("hadoop.home.dir", hadoopDIR.getAbsolutePath()); // set the JVM system property so that Spark finds it
 		
-		// The code submitted for the assessed exerise may be run in either local or remote modes
+		// The code submitted for the assessed exercise may be run in either local or remote modes
 		// Configuration of this will be performed based on an environment variable
 		String sparkMasterDef = System.getenv("spark.master");
 		if (sparkMasterDef==null) sparkMasterDef = "local[2]"; // default is local mode with two executors
@@ -99,6 +101,10 @@ public class AssessedExercise {
 		// Your Spark Topology should be defined here
 		//----------------------------------------------------------------
 		
+		// 1. Map News to NewsTokens
+		Dataset<NewsTokens> newsTokens = news.map(new NewsTokensFormaterMap(), Encoders.bean(NewsTokens.class));
+		
+		List<NewsTokens> test = newsTokens.collectAsList();
 		
 		return null; // replace this with the the list of DocumentRanking output by your topology
 	}

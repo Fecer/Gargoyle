@@ -29,7 +29,7 @@ public class NewsTokens implements Serializable{
 	}
 	
 	
-	
+	public NewsTokens() {};
 	
 	public NewsTokens(String id, List<String> tokens) {
 		super();
