@@ -1,5 +1,9 @@
 package uk.ac.gla.dcs.bigdata.studentstructures;
 
-public class NewsScore {
+import java.io.Serializable;
+
+public class NewsScore implements Serializable{
+
+
 
 }
