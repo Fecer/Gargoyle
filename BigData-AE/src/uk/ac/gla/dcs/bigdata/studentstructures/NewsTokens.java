@@ -10,7 +10,9 @@ public class NewsTokens implements Serializable{
 	private static final long serialVersionUID = -2374545335021590334L;
 	
 	String id;
+	String title;
 	List<String> tokens;//tokens of title + five (or less)paragraph
+	
 	
 	public String getId() {
 		return id;
@@ -20,6 +22,14 @@ public class NewsTokens implements Serializable{
 		this.id = id;
 	}
 	
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
 	public List<String> getTokens() {
 		return tokens;
 	}
@@ -31,9 +41,10 @@ public class NewsTokens implements Serializable{
 	
 	public NewsTokens() {};
 	
-	public NewsTokens(String id, List<String> tokens) {
+	public NewsTokens(String id, String title, List<String> tokens) {
 		super();
 		this.id = id;
+		this.title = title;
 		this.tokens = tokens;
 	}
 	

@@ -46,7 +46,7 @@ public class NewsTokensFormaterMap implements MapFunction<NewsArticle,NewsTokens
 //			System.out.println(j.next().toString());
 //		}
 		
-		return new NewsTokens(resId, newsTerms);
+		return new NewsTokens(resId, value.getTitle(), newsTerms);
 	}
 	
 	
