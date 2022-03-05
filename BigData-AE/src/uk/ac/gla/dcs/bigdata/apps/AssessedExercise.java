@@ -17,8 +17,10 @@ import uk.ac.gla.dcs.bigdata.providedstructures.ContentItem;
 import uk.ac.gla.dcs.bigdata.providedstructures.DocumentRanking;
 import uk.ac.gla.dcs.bigdata.providedstructures.NewsArticle;
 import uk.ac.gla.dcs.bigdata.providedstructures.Query;
+import uk.ac.gla.dcs.bigdata.studentfunctions.NewsScoreCalculator;
 import uk.ac.gla.dcs.bigdata.studentfunctions.NewsTokensFormaterMap;
 import uk.ac.gla.dcs.bigdata.studentstructures.NewsTokens;
+import uk.ac.gla.dcs.bigdata.studentstructures.QueryNewsAVGScore;
 
 /**
  * This is the main class where your Spark topology should be specified.
@@ -111,7 +113,8 @@ public class AssessedExercise {
 		
 		// 2. Map Query to Query-News Score ( NewsTokens as secondary data)
 		Broadcast<List<NewsTokens>> newsTokensBV = JavaSparkContext.fromSparkContext(spark.sparkContext()).broadcast(newsTokensList);
-		
+		Dataset<QueryNewsAVGScore> scorePerQuery = queries.map(new NewsScoreCalculator(newsTokensBV), Encoders.bean(QueryNewsAVGScore.class));
+		List<QueryNewsAVGScore> scorePerQueryList = scorePerQuery.collectAsList();
 		
 		return null; // replace this with the the list of DocumentRanking output by your topology
 	}

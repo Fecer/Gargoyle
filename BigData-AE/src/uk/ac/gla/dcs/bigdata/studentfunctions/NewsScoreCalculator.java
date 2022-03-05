@@ -21,11 +21,16 @@ public class NewsScoreCalculator implements MapFunction<Query,QueryNewsAVGScore>
 	Broadcast<List<NewsTokens>> newsTokensBV;
 	
 	
-	
+	public NewsScoreCalculator(Broadcast<List<NewsTokens>> newsTokensBV) {
+		super();
+		this.newsTokensBV = newsTokensBV;
+	}
+
 	@Override
 	public QueryNewsAVGScore call(Query value) throws Exception {
 		List<String> qTermList = value.getQueryTerms();
 		List<NewsTokens> newsTokens = newsTokensBV.value();
+		
 		// Cal 5.totalDocsInCorpus lv1
 		long totalDocsInCorpus = newsTokens.size();			// doc nums in corpus
 		int qtSize = qTermList.size();						// all query-terms nums
@@ -33,15 +38,19 @@ public class NewsScoreCalculator implements MapFunction<Query,QueryNewsAVGScore>
 		// Cal 4.averageDocumentLengthInCorpus lv1
 		double totalDocumentLengthInCorpus = 0;
 		double averageDocumentLengthInCorpus = 0;
-		List<Integer> buf3 = new ArrayList<Integer>((int) totalDocsInCorpus);	// To Store 3.
+		
+		System.out.println(value.getOriginalQuery());
+		List<Integer> buf3 = new ArrayList<>((int)totalDocsInCorpus);	// To Store 3.
 		for(int i = 0; i < totalDocsInCorpus; i++) {
 			// Cal 3.currentDocumentLength lv3
 			int termNumsInDocs = newsTokens.get(i).getTokens().size();	// number of terms in each doc
-			buf3.set(i, termNumsInDocs); 	// store 3
+//			System.out.println(termNumsInDocs);
+			buf3.add(termNumsInDocs); 	// store 3
 			totalDocumentLengthInCorpus += termNumsInDocs;
 		}
 		averageDocumentLengthInCorpus = (double) totalDocumentLengthInCorpus / totalDocsInCorpus;
-		
+//		System.out.println(averageDocumentLengthInCorpus);
+
 		List<ArrayList<Double>> scoreBuf = new ArrayList<ArrayList<Double>>(qtSize);
 		// for each query term
 		for(int i = 0; i < qtSize; i++) {
@@ -56,15 +65,24 @@ public class NewsScoreCalculator implements MapFunction<Query,QueryNewsAVGScore>
 			for(int j = 0; j < totalDocsInCorpus; j++) {
 				// Cal 1.termFrequencyInCurrentDocument lv3
 				short termFrequencyInCurrentDocument = (short) Collections.frequency(newsTokens.get(j).getTokens(), curQueryTerm);
-				buf1.set(j, termFrequencyInCurrentDocument);
+//				System.out.println(termFrequencyInCurrentDocument);
+				buf1.add(termFrequencyInCurrentDocument);
 				// Cal 2.totalTermFrequencyInCorpus lv2
 				totalTermFrequencyInCorpus += termFrequencyInCurrentDocument;
 			}
+//			System.out.println(totalTermFrequencyInCorpus);
 			
 			// for each qterm-news get DPHScore
 			List<Double> perTermScore = new ArrayList<Double>((int) totalDocsInCorpus);
 			for(int j = 0; j < totalDocsInCorpus; j++) {
-				perTermScore.set(j, DPHScorer.getDPHScore(buf1.get(j), totalTermFrequencyInCorpus, buf3.get(j), averageDocumentLengthInCorpus, totalDocsInCorpus));
+//				System.out.println(buf1.get(j));
+//				System.out.println(totalTermFrequencyInCorpus);
+//				System.out.println(buf3.get(j));
+//				System.out.println(averageDocumentLengthInCorpus);
+//				System.out.println(totalDocsInCorpus);
+				perTermScore.add(DPHScorer.getDPHScore(buf1.get(j), totalTermFrequencyInCorpus, buf3.get(j), averageDocumentLengthInCorpus, totalDocsInCorpus));
+				if(!perTermScore.get(j).isNaN())
+					System.out.println(perTermScore.get(j));
 			}
 			scoreBuf.add((ArrayList<Double>) perTermScore);
 			
@@ -86,7 +104,12 @@ public class NewsScoreCalculator implements MapFunction<Query,QueryNewsAVGScore>
 			String _title = newsTokens.get(j).getTitle();
 			newsScoreList.add(new NewsScore(_id, _score, _title));
 		}
+		
 		QueryNewsAVGScore res = new QueryNewsAVGScore(value, newsScoreList);
+//		for(int i = 0; i < res.getScoreList().size(); i++) {
+//			System.out.println(res.getScoreList().get(i).getTitle());
+//			System.out.println(res.getScoreList().get(i).getDPHScore());
+//		}
 		
 		return res;
 	}
