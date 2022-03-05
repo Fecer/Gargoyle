@@ -10,9 +10,9 @@ public class QueryNewsAVGScore implements Serializable{
 	
 	private static final long serialVersionUID = 8125514795623491914L;
 
-	
 	Query query;
-	List<NewsScore>scoreList;
+	List<NewsScore> scoreList;
+	
     public QueryNewsAVGScore() {};
 	
 	public QueryNewsAVGScore(Query query, List<NewsScore>scoreList) {
