@@ -97,18 +97,18 @@ public class NewsScoreCalculator implements MapFunction<Query,QueryNewsAVGScore>
 			if(Double.isNaN(_score)) continue;
 			
 			String _title = newsTokens.get(j).getTitle();
-			newsScoreList.add(new NewsScore(_id, _score, _title));
+			newsScoreList.add(new NewsScore(_id, _score, _title, newsTokens.get(j).getNewsArticle()));
 		}
 		
-		// Sort NewsList by Score
-		Collections.sort(newsScoreList, Comparator.comparingDouble(NewsScore::getDPHScore).reversed());
+//		// Sort NewsList by Score
+//		Collections.sort(newsScoreList, Comparator.comparingDouble(NewsScore::getDPHScore).reversed());
 		
 		QueryNewsAVGScore res = new QueryNewsAVGScore(value, newsScoreList);
-		for(int i = 0; i < res.getScoreList().size(); i++) {
-			System.out.println(res.getScoreList().get(i).getId());
-//			System.out.println(res.getScoreList().get(i).getTitle());
-			System.out.println(res.getScoreList().get(i).getDPHScore());
-		}
+//		for(int i = 0; i < res.getScoreList().size(); i++) {
+//			System.out.println(res.getScoreList().get(i).getId());
+////			System.out.println(res.getScoreList().get(i).getTitle());
+//			System.out.println(res.getScoreList().get(i).getDPHScore());
+//		}
 		
 		return res;
 	}
