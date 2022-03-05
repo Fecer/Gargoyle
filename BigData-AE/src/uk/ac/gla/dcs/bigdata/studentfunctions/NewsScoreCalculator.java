@@ -2,6 +2,7 @@ package uk.ac.gla.dcs.bigdata.studentfunctions;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.spark.api.java.function.MapFunction;
@@ -39,17 +40,15 @@ public class NewsScoreCalculator implements MapFunction<Query,QueryNewsAVGScore>
 		double totalDocumentLengthInCorpus = 0;
 		double averageDocumentLengthInCorpus = 0;
 		
-		System.out.println(value.getOriginalQuery());
 		List<Integer> buf3 = new ArrayList<>((int)totalDocsInCorpus);	// To Store 3.
 		for(int i = 0; i < totalDocsInCorpus; i++) {
 			// Cal 3.currentDocumentLength lv3
 			int termNumsInDocs = newsTokens.get(i).getTokens().size();	// number of terms in each doc
-//			System.out.println(termNumsInDocs);
+
 			buf3.add(termNumsInDocs); 	// store 3
 			totalDocumentLengthInCorpus += termNumsInDocs;
 		}
 		averageDocumentLengthInCorpus = (double) totalDocumentLengthInCorpus / totalDocsInCorpus;
-//		System.out.println(averageDocumentLengthInCorpus);
 
 		List<ArrayList<Double>> scoreBuf = new ArrayList<ArrayList<Double>>(qtSize);
 		// for each query term
@@ -70,19 +69,12 @@ public class NewsScoreCalculator implements MapFunction<Query,QueryNewsAVGScore>
 				// Cal 2.totalTermFrequencyInCorpus lv2
 				totalTermFrequencyInCorpus += termFrequencyInCurrentDocument;
 			}
-//			System.out.println(totalTermFrequencyInCorpus);
+
 			
 			// for each qterm-news get DPHScore
 			List<Double> perTermScore = new ArrayList<Double>((int) totalDocsInCorpus);
 			for(int j = 0; j < totalDocsInCorpus; j++) {
-//				System.out.println(buf1.get(j));
-//				System.out.println(totalTermFrequencyInCorpus);
-//				System.out.println(buf3.get(j));
-//				System.out.println(averageDocumentLengthInCorpus);
-//				System.out.println(totalDocsInCorpus);
 				perTermScore.add(DPHScorer.getDPHScore(buf1.get(j), totalTermFrequencyInCorpus, buf3.get(j), averageDocumentLengthInCorpus, totalDocsInCorpus));
-				if(!perTermScore.get(j).isNaN())
-					System.out.println(perTermScore.get(j));
 			}
 			scoreBuf.add((ArrayList<Double>) perTermScore);
 			
@@ -101,13 +93,20 @@ public class NewsScoreCalculator implements MapFunction<Query,QueryNewsAVGScore>
 				_scoreNum += value.getQueryTermCounts()[i];
 			}
 			_score /= (double)_scoreNum;
+			
+			if(Double.isNaN(_score)) continue;
+			
 			String _title = newsTokens.get(j).getTitle();
-			newsScoreList.add(new NewsScore(_id, _score, _title));
+			newsScoreList.add(new NewsScore(_id, _score, _title, newsTokens.get(j).getNewsArticle()));
 		}
+		
+//		// Sort NewsList by Score
+//		Collections.sort(newsScoreList, Comparator.comparingDouble(NewsScore::getDPHScore).reversed());
 		
 		QueryNewsAVGScore res = new QueryNewsAVGScore(value, newsScoreList);
 //		for(int i = 0; i < res.getScoreList().size(); i++) {
-//			System.out.println(res.getScoreList().get(i).getTitle());
+//			System.out.println(res.getScoreList().get(i).getId());
+////			System.out.println(res.getScoreList().get(i).getTitle());
 //			System.out.println(res.getScoreList().get(i).getDPHScore());
 //		}
 		

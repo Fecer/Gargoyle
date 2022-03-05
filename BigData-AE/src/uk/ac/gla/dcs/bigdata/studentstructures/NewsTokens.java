@@ -3,6 +3,8 @@ package uk.ac.gla.dcs.bigdata.studentstructures;
 import java.io.Serializable;
 import java.util.List;
 
+import uk.ac.gla.dcs.bigdata.providedstructures.NewsArticle;
+
 //import uk.ac.gla.dcs.bigdata.providedstructures.ContentItem;
 
 public class NewsTokens implements Serializable{
@@ -12,7 +14,15 @@ public class NewsTokens implements Serializable{
 	String id;
 	String title;
 	List<String> tokens;//tokens of title + five (or less)paragraph
+	NewsArticle news;
 	
+	public NewsArticle getNewsArticle() {
+		return news;
+	}
+	
+	public void setNewsArticle(NewsArticle news) {
+		this.news = news;
+	}
 	
 	public String getId() {
 		return id;
@@ -41,11 +51,12 @@ public class NewsTokens implements Serializable{
 	
 	public NewsTokens() {};
 	
-	public NewsTokens(String id, String title, List<String> tokens) {
+	public NewsTokens(String id, String title, List<String> tokens, NewsArticle news) {
 		super();
 		this.id = id;
 		this.title = title;
 		this.tokens = tokens;
+		this.news = news;
 	}
 	
 	
