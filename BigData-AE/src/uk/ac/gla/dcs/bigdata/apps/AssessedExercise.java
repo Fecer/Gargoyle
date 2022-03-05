@@ -7,6 +7,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -108,13 +109,21 @@ public class AssessedExercise {
 		//----------------------------------------------------------------
 		
 		// 1. Map News to NewsTokens
-		Dataset<NewsTokens> newsTokens = news.map(new NewsTokensFormaterMap(), Encoders.bean(NewsTokens.class));
+		Encoder<NewsTokens> newsTokensEncoder = Encoders.bean(NewsTokens.class);
+		Dataset<NewsTokens> newsTokens = news.map(new NewsTokensFormaterMap(), newsTokensEncoder);
 		List<NewsTokens> newsTokensList = newsTokens.collectAsList();
 		
 		// 2. Map Query to Query-News Score ( NewsTokens as secondary data)
 		Broadcast<List<NewsTokens>> newsTokensBV = JavaSparkContext.fromSparkContext(spark.sparkContext()).broadcast(newsTokensList);
-		Dataset<QueryNewsAVGScore> scorePerQuery = queries.map(new NewsScoreCalculator(newsTokensBV), Encoders.bean(QueryNewsAVGScore.class));
+		Encoder<QueryNewsAVGScore> scorePerQueryEncoder = Encoders.bean(QueryNewsAVGScore.class);
+		Dataset<QueryNewsAVGScore> scorePerQuery = queries.map(new NewsScoreCalculator(newsTokensBV), scorePerQueryEncoder);
 		List<QueryNewsAVGScore> scorePerQueryList = scorePerQuery.collectAsList();
+
+		// 3. Reduce Every NewsScore in QueryNewsAVGScore
+		int scorePerQuerySize = scorePerQueryList.size();
+		for(int i = 0; i < scorePerQuerySize; i++) {
+			scorePerQueryList.get(i).getScoreList()
+		}
 		
 		return null; // replace this with the the list of DocumentRanking output by your topology
 	}

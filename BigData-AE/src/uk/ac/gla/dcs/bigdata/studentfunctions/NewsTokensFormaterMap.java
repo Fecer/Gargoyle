@@ -23,6 +23,7 @@ public class NewsTokensFormaterMap implements MapFunction<NewsArticle,NewsTokens
 		
 		String resId = value.getId();
 		String textBuffer = value.getTitle();	
+//		System.out.println(value.getTitle());
 		List<ContentItem> contents = value.getContents();
 		int cnt = 0;	// Paragraph nums
 		
@@ -40,11 +41,6 @@ public class NewsTokensFormaterMap implements MapFunction<NewsArticle,NewsTokens
 		}
 		
 		List<String> newsTerms = processor.process(textBuffer);
-		
-//		Iterator<String> j = newsTerms.iterator();
-//		while(j.hasNext()) {
-//			System.out.println(j.next().toString());
-//		}
 		
 		return new NewsTokens(resId, value.getTitle(), newsTerms);
 	}
