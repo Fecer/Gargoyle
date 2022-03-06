@@ -1,6 +1,9 @@
 package uk.ac.gla.dcs.bigdata.apps;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -42,15 +45,18 @@ import uk.ac.gla.dcs.bigdata.studentstructures.QueryNewsAVGScore;
 public class AssessedExercise {
 
 	
-	public static void main(String[] args) {
+public static void main(String[] args) {
 		
-		File hadoopDIR = new File("resources/hadoop/"); // represent the hadoop directory as a Java file so we can get an absolute path for it
-		System.setProperty("hadoop.home.dir", hadoopDIR.getAbsolutePath()); // set the JVM system property so that Spark finds it
 		
-		// The code submitted for the assessed exercise may be run in either local or remote modes
+		
+		// The code submitted for the assessed exerise may be run in either local or remote modes
 		// Configuration of this will be performed based on an environment variable
-		String sparkMasterDef = System.getenv("spark.master");
-		if (sparkMasterDef==null) sparkMasterDef = "local[2]"; // default is local mode with two executors
+		String sparkMasterDef = System.getenv("SPARK_MASTER");
+		if (sparkMasterDef==null) {
+			File hadoopDIR = new File("resources/hadoop/"); // represent the hadoop directory as a Java file so we can get an absolute path for it
+			System.setProperty("hadoop.home.dir", hadoopDIR.getAbsolutePath()); // set the JVM system property so that Spark finds it
+			sparkMasterDef = "local[2]"; // default is local mode with two executors
+		}
 		
 		String sparkSessionName = "BigDataAE"; // give the session a name
 		
@@ -67,11 +73,11 @@ public class AssessedExercise {
 	
 		
 		// Get the location of the input queries
-		String queryFile = System.getenv("bigdata.queries");
+		String queryFile = System.getenv("BIGDATA_QUERIES");
 		if (queryFile==null) queryFile = "data/queries.list"; // default is a sample with 3 queries
 		
 		// Get the location of the input news articles
-		String newsFile = System.getenv("bigdata.news");
+		String newsFile = System.getenv("BIGDATA_NEWS");
 		if (newsFile==null) newsFile = "data/TREC_Washington_Post_collection.v3.example.json"; // default is a sample of 5000 news articles
 		
 		// Call the student's code
@@ -80,20 +86,28 @@ public class AssessedExercise {
 		// Close the spark session
 		spark.close();
 		
+		String out = System.getenv("BIGDATA_RESULTS");
+		String resultsDIR = "results/";
+		if (out!=null) resultsDIR = out;
+		
 		// Check if the code returned any results
 		if (results==null) System.err.println("Topology return no rankings, student code may not be implemented, skiping final write.");
 		else {
 			
-			// We have set of output rankings, lets write to disk
-			
-			// Create a new folder 
-			File outDirectory = new File("results/"+System.currentTimeMillis());
-			if (!outDirectory.exists()) outDirectory.mkdir();
-			
 			// Write the ranking for each query as a new file
 			for (DocumentRanking rankingForQuery : results) {
-				rankingForQuery.write(outDirectory.getAbsolutePath());
+				rankingForQuery.write(new File(resultsDIR).getAbsolutePath());
 			}
+		}
+		
+		try {
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(resultsDIR).getAbsolutePath()+"/SPARK.DONE")));
+			writer.write(String.valueOf(System.currentTimeMillis()));
+			writer.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		
 		
