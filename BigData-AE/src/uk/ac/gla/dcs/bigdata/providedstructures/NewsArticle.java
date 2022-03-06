@@ -3,6 +3,7 @@ package uk.ac.gla.dcs.bigdata.providedstructures;
 import java.io.Serializable;
 import java.util.List;
 
+
 /**
  * Represents a single news article from the source Washington Post Corpus
  * @author Richard
