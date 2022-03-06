@@ -32,7 +32,7 @@ public class RemoteSubmit {
 		
 		System.out.println("# Stage 1: Register Your GitLab Repo with the Realization Engine");
 		System.out.print("Sending Registration Request...");
-		boolean registerOk = RealizationEngineClient.registerApplication(args[0], args[1], "bdae");
+		boolean registerOk = RealizationEngineClient.registerApplication(args[0], args[1], "bdaefull");
 		if (registerOk) {
 			System.out.println("OK");
 		} else {
