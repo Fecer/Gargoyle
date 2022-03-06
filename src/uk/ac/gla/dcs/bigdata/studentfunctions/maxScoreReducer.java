@@ -10,7 +10,7 @@ public class maxScoreReducer implements ReduceFunction<NewsScore> {
 
 	@Override
 	public NewsScore call(NewsScore v1, NewsScore v2) throws Exception {
-		
+		// Get the bigger value
 		return v1.getDPHScore() > v2.getDPHScore() ? v1 : v2;
 	}
 

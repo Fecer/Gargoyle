@@ -45,12 +45,7 @@ import uk.ac.gla.dcs.bigdata.studentstructures.QueryNewsAVGScore;
  *
  */
 public class AssessedExercise {
-
-	
 	public static void main(String[] args) {
-		
-		
-		
 		// The code submitted for the assessed exerise may be run in either local or remote modes
 		// Configuration of this will be performed based on an environment variable
 		String sparkMasterDef = System.getenv("SPARK_MASTER");
@@ -133,90 +128,83 @@ public class AssessedExercise {
 		// Your Spark Topology should be defined here
 		//----------------------------------------------------------------
 		
-		// 1. FlatMap News to NewsTokens
-				Encoder<NewsTokens> newsTokensEncoder = Encoders.bean(NewsTokens.class);
-				Dataset<NewsTokens> newsTokens = news.flatMap(new NewsTokensFormaterFlatMap(), newsTokensEncoder);
-				List<NewsTokens> newsTokensList = newsTokens.collectAsList();
-				
-				// 2. Map Query to Query-News Score ( NewsTokens as secondary data)
-				Broadcast<List<NewsTokens>> newsTokensBV = JavaSparkContext.fromSparkContext(spark.sparkContext()).broadcast(newsTokensList);
-				Encoder<QueryNewsAVGScore> scorePerQueryEncoder = Encoders.bean(QueryNewsAVGScore.class);
-				Dataset<QueryNewsAVGScore> scorePerQuery = queries.map(new NewsScoreCalculator(newsTokensBV), scorePerQueryEncoder);
-				List<QueryNewsAVGScore> scorePerQueryList = scorePerQuery.collectAsList();
+		// 1. FlatMap News to <NewsTokens>
+		Encoder<NewsTokens> newsTokensEncoder = Encoders.bean(NewsTokens.class);
+		Dataset<NewsTokens> newsTokens = news.flatMap(new NewsTokensFormaterFlatMap(), newsTokensEncoder);
+		List<NewsTokens> newsTokensList = newsTokens.collectAsList();
+		
+		// 2. Map Query to Query-News Score ( <NewsTokens> as secondary data)
+		Broadcast<List<NewsTokens>> newsTokensBV = JavaSparkContext.fromSparkContext(spark.sparkContext()).broadcast(newsTokensList);
+		Encoder<QueryNewsAVGScore> scorePerQueryEncoder = Encoders.bean(QueryNewsAVGScore.class);
+		Dataset<QueryNewsAVGScore> scorePerQuery = queries.map(new NewsScoreCalculator(newsTokensBV), scorePerQueryEncoder);
+		List<QueryNewsAVGScore> scorePerQueryList = scorePerQuery.collectAsList();
 
-				// 3.1 Build result instance
-				List<DocumentRanking> drList = new ArrayList<DocumentRanking>();
+		// 3.1 Build result List
+		List<DocumentRanking> drList = new ArrayList<DocumentRanking>();
 				
-				// 3.2 Reduce Every NewsScore in QueryNewsAVGScore to find MAX
-				int queryNum = scorePerQueryList.size();
-				for(int i = 0; i < queryNum; i++) {
-					// Build DocumentRanking for every Query 
-					System.out.println("For Query:");
-					System.out.println(i);
-					DocumentRanking curQ = new DocumentRanking();
-					curQ.setQuery(scorePerQueryList.get(i).getQuery());
-					drList.add(curQ);
+		// 3.2 Reduce Every NewsScore in QueryNewsAVGScore to find MAX
+		int queryNum = scorePerQueryList.size();
+		for(int i = 0; i < queryNum; i++) {
+			
+			// Build DocumentRanking for every Query 
+			DocumentRanking curQ = new DocumentRanking();
+			curQ.setQuery(scorePerQueryList.get(i).getQuery());
+			drList.add(curQ);				// Add current query's DocumentRanking to result list
+			
+			List<RankedResult> resList = new ArrayList<RankedResult>();
+			curQ.setResults(resList);		// Add <RankedResult> list to curQuery's DocumentRanking
 					
-					List<RankedResult> resList = new ArrayList<RankedResult>();
-					curQ.setResults(resList);	// Add resList to curQuery's DocumentRanking
-					
-					// Find 10 news
-					int cnt = 10;		
-					List<NewsScore> curNewsList = scorePerQueryList.get(i).getScoreList();
-					while(cnt > 0) {
-						if(curNewsList.isEmpty())
-							break;
-						System.out.println("Article Number:");
-						System.out.println(11 - cnt);
-						Dataset<NewsScore> curNewsDS = spark.createDataset(curNewsList, Encoders.bean(NewsScore.class));
+			// Find 10 news
+			int cnt = 10;		
+			List<NewsScore> curNewsList = scorePerQueryList.get(i).getScoreList();
+			while(cnt > 0) {
+				
+				if(curNewsList.isEmpty())	// No more available news
+					break;
+
+				// Get MAX Score from current source dataset
+				Dataset<NewsScore> curNewsDS = spark.createDataset(curNewsList, Encoders.bean(NewsScore.class));
+				NewsScore maxNews = curNewsDS.reduce(new maxScoreReducer());
+		
+				// Remove MAX from source dataset
+				Iterator<NewsScore> k = curNewsList.iterator();
+				while(k.hasNext()) {
+					NewsScore nsPointer = k.next();
+					if(nsPointer.equals(maxNews)) 
+						k.remove();
+				}
 						
-						// Get MAX Score from current source dataset
-						NewsScore maxNews = curNewsDS.reduce(new maxScoreReducer());
-						System.out.println(maxNews.getTitle());
-						System.out.println(maxNews.getDPHScore());
-						
-						
-						// Remove MAX from source dataset
-						Iterator<NewsScore> k = curNewsList.iterator();
-						while(k.hasNext()) {
-							NewsScore nsPointer = k.next();
-							if(nsPointer.equals(maxNews)) {
-								System.out.println("Deleting.");
-								k.remove();
-							}
-						}
-						
-						// Try to add MAX to res dataset
-						boolean insert = true;
-						Iterator<RankedResult> resI = resList.iterator();
-						while(resI.hasNext()) {
-							RankedResult rr = resI.next();
-							// Compare MAX with every element in res dataset
-							// Calculate TextDistance
-							if(TextDistanceCalculator.similarity(rr.getArticle().getTitle(), maxNews.getTitle()) < 0.5) {
-								// Discard curMax and find nextMax
-								insert = false;
-								break;
-							}else {
-								// Find next rr
-							}
-						}
-						
-						if(insert == true) {
-							// Put Inside
-							RankedResult curRes = new RankedResult(maxNews.getId(), maxNews.getNewsArticle(), maxNews.getDPHScore());
-							resList.add(curRes);
-							cnt--;
-						}else {
-							// Find nextMax
-						}
-						
+				// Try to add MAX to res dataset
+				boolean insert = true;
+				Iterator<RankedResult> resI = resList.iterator();
+				while(resI.hasNext()) {
+					RankedResult rr = resI.next();
+					// Compare MAX with every element in res dataset
+					// Calculate TextDistance
+					if(TextDistanceCalculator.similarity(rr.getArticle().getTitle(), maxNews.getTitle()) < 0.5) { 	// if too similar
+						// Discard curMax and find nextMax
+						insert = false;
+						break;
+					}else {		// not too similar
+						// Find next rr by do nothing
 					}
+				}
+						
+				if(insert == true) {
+					// Put curMax inside the resList
+					RankedResult curRes = new RankedResult(maxNews.getId(), maxNews.getNewsArticle(), maxNews.getDPHScore());
+					resList.add(curRes);
+					cnt--;	// cnt news left to be find
+				}else {
+					// Find nextMax by do nothing
+				}
+						
+			}
 					
-				}
+		}
 				
-				return drList; // replace this with the the list of DocumentRanking output by your topology
-				}
+		return drList; // replace this with the the list of DocumentRanking output by your topology
+	}
 	
 	
 }
