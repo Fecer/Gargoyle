@@ -64,7 +64,7 @@ public class NewsScoreCalculator implements MapFunction<Query,QueryNewsAVGScore>
 			for(int j = 0; j < totalDocsInCorpus; j++) {
 				// Cal 1.termFrequencyInCurrentDocument lv3
 				short termFrequencyInCurrentDocument = (short) Collections.frequency(newsTokens.get(j).getTokens(), curQueryTerm);
-//				System.out.println(termFrequencyInCurrentDocument);
+
 				buf1.add(termFrequencyInCurrentDocument);
 				// Cal 2.totalTermFrequencyInCorpus lv2
 				totalTermFrequencyInCorpus += termFrequencyInCurrentDocument;
@@ -74,7 +74,12 @@ public class NewsScoreCalculator implements MapFunction<Query,QueryNewsAVGScore>
 			// for each qterm-news get DPHScore
 			List<Double> perTermScore = new ArrayList<Double>((int) totalDocsInCorpus);
 			for(int j = 0; j < totalDocsInCorpus; j++) {
-				perTermScore.add(DPHScorer.getDPHScore(buf1.get(j), totalTermFrequencyInCorpus, buf3.get(j), averageDocumentLengthInCorpus, totalDocsInCorpus));
+				double termNewsScore = DPHScorer.getDPHScore(buf1.get(j), totalTermFrequencyInCorpus, buf3.get(j), averageDocumentLengthInCorpus, totalDocsInCorpus);
+				if(Double.isNaN(termNewsScore)) {
+					perTermScore.add((double) 0);
+				}else {
+					perTermScore.add(termNewsScore);
+				}
 			}
 			scoreBuf.add((ArrayList<Double>) perTermScore);
 			

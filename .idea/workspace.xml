@@ -2,12 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="dc169804-d29b-4229-91ff-84f54cca45da" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/BigData-AE/src/uk/ac/gla/dcs/bigdata/apps/AssessedExercise.java" beforeDir="false" afterPath="$PROJECT_DIR$/BigData-AE/src/uk/ac/gla/dcs/bigdata/apps/AssessedExercise.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BigData-AE/src/uk/ac/gla/dcs/bigdata/studentfunctions/NewsScoreCalculator.java" beforeDir="false" afterPath="$PROJECT_DIR$/BigData-AE/src/uk/ac/gla/dcs/bigdata/studentfunctions/NewsScoreCalculator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BigData-AE/src/uk/ac/gla/dcs/bigdata/studentfunctions/NewsTokensFormaterMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/BigData-AE/src/uk/ac/gla/dcs/bigdata/studentfunctions/NewsTokensFormaterFlatMap.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BigData-AE/src/uk/ac/gla/dcs/bigdata/studentfunctions/uniqueTitleReducer.java" beforeDir="false" afterPath="$PROJECT_DIR$/BigData-AE/src/uk/ac/gla/dcs/bigdata/studentfunctions/maxScoreReducer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BigData-AE/src/uk/ac/gla/dcs/bigdata/studentstructures/NewsScore.java" beforeDir="false" afterPath="$PROJECT_DIR$/BigData-AE/src/uk/ac/gla/dcs/bigdata/studentstructures/NewsScore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BigData-AE/src/uk/ac/gla/dcs/bigdata/studentstructures/NewsTokens.java" beforeDir="false" afterPath="$PROJECT_DIR$/BigData-AE/src/uk/ac/gla/dcs/bigdata/studentstructures/NewsTokens.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/queries.list" beforeDir="false" afterPath="$PROJECT_DIR$/data/queries.list" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/SPARK.DONE" beforeDir="false" afterPath="$PROJECT_DIR$/results/SPARK.DONE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/result.james_bond.documentranking" beforeDir="false" afterPath="$PROJECT_DIR$/results/result.james_bond.documentranking" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/uk/ac/gla/dcs/bigdata/apps/AssessedExercise.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/uk/ac/gla/dcs/bigdata/apps/AssessedExercise.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/uk/ac/gla/dcs/bigdata/apps/RemoteSubmit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/uk/ac/gla/dcs/bigdata/apps/RemoteSubmit.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/uk/ac/gla/dcs/bigdata/studentfunctions/NewsScoreCalculator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/uk/ac/gla/dcs/bigdata/studentfunctions/NewsScoreCalculator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/uk/ac/gla/dcs/bigdata/apps/AssessedExercise.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/uk/ac/gla/dcs/bigdata/apps/AssessedExercise.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/uk/ac/gla/dcs/bigdata/apps/RemoteSubmit.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/uk/ac/gla/dcs/bigdata/apps/RemoteSubmit.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/uk/ac/gla/dcs/bigdata/studentfunctions/NewsScoreCalculator.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/uk/ac/gla/dcs/bigdata/studentfunctions/NewsScoreCalculator.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,6 +32,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -37,10 +44,22 @@
       <option name="presentableId" value="Default" />
       <updated>1646504779431</updated>
       <workItem from="1646504783514" duration="8000" />
+      <workItem from="1646567695934" duration="29000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

@@ -172,7 +172,9 @@ public class AssessedExercise {
 						
 						// Get MAX Score from current source dataset
 						NewsScore maxNews = curNewsDS.reduce(new maxScoreReducer());
+						System.out.println(maxNews.getTitle());
 						System.out.println(maxNews.getDPHScore());
+						
 						
 						// Remove MAX from source dataset
 						Iterator<NewsScore> k = curNewsList.iterator();
