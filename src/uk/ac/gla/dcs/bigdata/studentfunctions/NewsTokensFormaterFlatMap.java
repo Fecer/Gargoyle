@@ -32,6 +32,10 @@ public class NewsTokensFormaterFlatMap implements FlatMapFunction<NewsArticle,Ne
 		
 //		System.out.println(value.getTitle());
 		List<ContentItem> contents = value.getContents();
+		if(contents == null) {
+			List<NewsTokens> resNT = new ArrayList<NewsTokens>(0);
+			return resNT.iterator();
+		}
 		int cnt = 0;	// Paragraph nums
 		
 		Iterator<ContentItem> i = contents.iterator();

@@ -29,29 +29,32 @@ public class NewsScoreCalculator implements MapFunction<Query,QueryNewsAVGScore>
 
 	@Override
 	public QueryNewsAVGScore call(Query value) throws Exception {
+	
 		List<String> qTermList = value.getQueryTerms();
 		List<NewsTokens> newsTokens = newsTokensBV.value();
 		
 		// Cal 5.totalDocsInCorpus lv1
 		long totalDocsInCorpus = newsTokens.size();			// doc nums in corpus
-		int qtSize = qTermList.size();						// all query-terms nums
+		int qtSize = qTermList.size();						// term nums in each query
 		
 		// Cal 4.averageDocumentLengthInCorpus lv1
-		double totalDocumentLengthInCorpus = 0;
+		double totalDocumentLengthInCorpus = 0;				// term nums in all documents
 		double averageDocumentLengthInCorpus = 0;
 		
+		// Go through the news dataset and get 3. 4. and 5. first
 		List<Integer> buf3 = new ArrayList<>((int)totalDocsInCorpus);	// To Store 3.
 		for(int i = 0; i < totalDocsInCorpus; i++) {
 			// Cal 3.currentDocumentLength lv3
-			int termNumsInDocs = newsTokens.get(i).getTokens().size();	// number of terms in each doc
+			int termNumsInDocs = newsTokens.get(i).getTokens().size();	// term nums in each doc
 
 			buf3.add(termNumsInDocs); 	// store 3
 			totalDocumentLengthInCorpus += termNumsInDocs;
 		}
 		averageDocumentLengthInCorpus = (double) totalDocumentLengthInCorpus / totalDocsInCorpus;
 
+		
 		List<ArrayList<Double>> scoreBuf = new ArrayList<ArrayList<Double>>(qtSize);
-		// for each query term
+		// for each query term get DPHScore 
 		for(int i = 0; i < qtSize; i++) {
 			String curQueryTerm = value.getQueryTerms().get(i);
 			
