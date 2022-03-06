@@ -43,11 +43,13 @@ public class NewsTokensFormaterFlatMap implements FlatMapFunction<NewsArticle,Ne
 			if (cnt >= 5) break;
 			
 			ContentItem cur = i.next();
-			if (cur.getSubtype() != null) {
-				if(cur.getSubtype().equals("paragraph")) {
-					textBuffer += cur.getContent();	// Concat all paragraph
-					cnt++;
-				}	
+			if(cur != null) {
+				if (cur.getSubtype() != null) {
+					if(cur.getSubtype().equals("paragraph")) {
+						textBuffer += cur.getContent();	// Concat all paragraph
+						cnt++;
+					}	
+				}
 			}
 		}
 
